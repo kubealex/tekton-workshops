@@ -10,59 +10,84 @@ spec:
     - name: shared-workspace
     - name: maven-settings
   tasks:
-    - name: fetch-repository
+    # - name: fetch-source-repository
+    #   taskRef:
+    #     name: git-clone
+    #   workspaces:
+    #     - name: output
+    #       workspace: shared-workspace
+    #   params:
+    #     - name: url
+    #       value: https://github.com/kubealex/hello-springboot.git
+    #     - name: subdirectory
+    #       value: ""
+    #     - name: deleteExisting
+    #       value: "true"
+    # - name: maven-run
+    #   taskRef:
+    #     name: maven
+    #   runAfter:
+    #     - fetch-source-repository
+    #   params:
+    #     - name: GOALS
+    #       value:
+    #         - -DskipTests
+    #         - package
+    #   workspaces:
+    #     - name: maven-settings
+    #       workspace: maven-settings
+    #     - name: source
+    #       workspace: shared-workspace
+    # - name: kaniko-build
+    #   taskRef:
+    #     name: build-kaniko-image
+    #   runAfter:
+    #     - maven-run
+    #   params:
+    #     - name: pathToDockerFile
+    #       value: Dockerfile
+    #   workspaces:
+    #     - name: source
+    #       workspace: shared-workspace
+    #   resources:
+    #     outputs:
+    #     - name: builtImage
+    #       resource: app-image
+    - name: fetch-manifests-repository
       taskRef:
         name: git-clone
+      # runAfter:
+      #   - kaniko-build
       workspaces:
         - name: output
           workspace: shared-workspace
       params:
         - name: url
-          value: https://github.com/kubealex/hello-springboot.git
+          value: https://github.com/kubealex/hello-manifests.git
         - name: subdirectory
           value: ""
         - name: deleteExisting
           value: "true"
     - name: ls-ws
       runAfter:
-        - fetch-repository
+        - fetch-manifests-repository
       taskRef: 
         name: ls-ws
       workspaces:
         - name: output
           workspace: shared-workspace
-    - name: maven-run
-      taskRef:
-        name: maven
+    - name: kustomize-manifests
       runAfter:
-        - fetch-repository
-      params:
-        - name: GOALS
-          value:
-            - -DskipTests
-            - package
-      workspaces:
-        - name: maven-settings
-          workspace: maven-settings
-        - name: source
-          workspace: shared-workspace
-
-    - name: kaniko-build
+        - fetch-manifests-repository
       taskRef:
-        name: build-kaniko-image
-      runAfter:
-        - maven-run
-      params:
-        - name: pathToDockerFile
-          value: Dockerfile
+        name: kustomize-manifests
       workspaces:
-        - name: source
+        - name: output
           workspace: shared-workspace
       resources:
-        outputs:
-        - name: builtImage
-          resource: app-image
-
+        inputs:
+          - name: app-image
+            resource: app-image
 ---
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun

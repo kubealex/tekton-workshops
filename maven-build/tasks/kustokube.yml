@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kustomize-manifests
+spec:
+  workspaces:
+    - name: output
+  resources:
+    inputs:
+      - name: app-image
+        type: image
+    # steps:
+  steps:
+    - name: echo
+      image: ubuntu
+      command:
+        - echo
+      args:
+        - "IMAGE:$(resources.inputs.app-image.url)"
+    - name: ls
+      image: ubuntu
+      command:
+        - ls
+      args:
+        - "-latr"
+        - "/workspace/output/"
+    - name: kustomize-edit
+      image: quay.io/kubealex/kustokubectl:latest
+      command:
+        - bash
+      args:
+        - "-c"
+        - kustomize edit set image IMAGE:$(resources.inputs.app-image.url)
+    - name: kustomize-build
+      image: quay.io/kubealex/kustokubectl:latest
+      command:
+        - kustomize
+      args:
+        - "build"
