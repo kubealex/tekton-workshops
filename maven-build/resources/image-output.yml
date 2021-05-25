@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: output-image-hello-world
+spec:
+  type: image
+  params:
+    - name: url
+      value: quay.io/kubealex/hello-tekton:latest

@@ -1,14 +1,23 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: run-maven-build
+  name: build-kaniko-image
 spec:
+  workspaces:
+    - name: source
+  params:
+    - name: pathToDockerFile
+      type: string
+      description: The path to the dockerfile to build
+      default: $(workspaces.source.path)/Dockerfile
+    - name: pathToContext
+      type: string
+      description: |
+        The build context used by Kaniko
+      default: $(workspaces.source.path)
   resources:
-    inputs:
-      - name: git-repo
-        type: git
     outputs:
-      - name: workspace
+      - name: builtImage
         type: image
   steps:
     - name: build-and-push

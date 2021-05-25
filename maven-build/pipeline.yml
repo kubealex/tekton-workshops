@@ -3,6 +3,9 @@ kind: Pipeline
 metadata:
   name: maven-test-pipeline
 spec:
+  resources:
+    - name: app-image
+      type: image
   workspaces:
     - name: shared-workspace
     - name: maven-settings
@@ -20,6 +23,14 @@ spec:
           value: ""
         - name: deleteExisting
           value: "true"
+    - name: ls-ws
+      runAfter:
+        - fetch-repository
+      taskRef: 
+        name: ls-ws
+      workspaces:
+        - name: output
+          workspace: shared-workspace
     - name: maven-run
       taskRef:
         name: maven
@@ -35,12 +46,30 @@ spec:
           workspace: maven-settings
         - name: source
           workspace: shared-workspace
+
+    - name: kaniko-build
+      taskRef:
+        name: build-kaniko-image
+      runAfter:
+        - maven-run
+      params:
+        - name: pathToDockerFile
+          value: Dockerfile
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      resources:
+        outputs:
+        - name: builtImage
+          resource: app-image
+
 ---
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   name: maven-test-pipeline-run
 spec:
+  serviceAccountName: kaniko-sa
   pipelineRef:
     name: maven-test-pipeline
   workspaces:
@@ -48,4 +77,14 @@ spec:
       configMap:
         name: custom-maven-settings
     - name: shared-workspace
-      emptyDir: {}        
+      volumeClaimTemplate:
+        spec:
+          accessModes: 
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+  resources:
+  - name: app-image
+    resourceRef:
+      name: output-image-hello-world
