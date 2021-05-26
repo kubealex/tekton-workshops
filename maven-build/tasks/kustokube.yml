@@ -29,5 +29,5 @@ spec:
       script: |
         #!/usr/bin/env bash
         cd $(workspaces.output.path)
-        kustomize edit set image IMAGE:$(resources.inputs.app-image.url) 
+        kustomize edit set image IMAGE=$(resources.inputs.app-image.url) 
         kustomize build 
