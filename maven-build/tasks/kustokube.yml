@@ -24,16 +24,10 @@ spec:
     #   args:
     #     - "-latr"
     #     - "/workspace/output/"
-    - name: kustomize-edit
+    - name: kustomize-phase
       image: quay.io/kubealex/kustokubectl:latest
-      command:
-        - bash
-      args:
-        - "-c"
-        - kustomize edit set image IMAGE:$(resources.inputs.app-image.url) $(workspaces.output.path)
-    - name: kustomize-build
-      image: quay.io/kubealex/kustokubectl:latest
-      command:
-        - kustomize
-      args:
-        - "build $(workspaces.output.path)"
+      script: |
+        #!/usr/bin/env bash
+        cd $(workspaces.output.path)
+        kustomize edit set image IMAGE:$(resources.inputs.app-image.url) 
+        kustomize build 
