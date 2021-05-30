@@ -18,7 +18,7 @@ First of all, you need to clone this repository in your local folder!
 
 You will find a simple workshop to play with:  
 
-- [Build and deploy a SpringBoot application in your cluster](https://github.com/kubealex/tekton-ws/tree/main/springboot-build-deploy)
+- [Build and deploy a SpringBoot application in your cluster](https://github.com/kubealex/tekton-ws/tree/main/workshops/springboot-build-deploy)
 
 
 As you can see in the content, each workshop contains its resources that are needed to run it.
