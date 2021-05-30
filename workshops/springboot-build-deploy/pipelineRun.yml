@@ -1,0 +1,26 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: build-and-deploy
+spec:
+  serviceAccountName: tekton-sa
+  pipelineRef:
+    name: build-and-deploy
+  workspaces:
+    - name: maven-settings
+      configMap:
+        name: custom-maven-settings
+    - name: shared-workspace
+      volumeClaimTemplate:
+        spec:
+          storageClassName: "manual"
+          accessModes: 
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+  resources:
+  - name: app-image
+    resourceRef:
+      name: output-image-hello-world

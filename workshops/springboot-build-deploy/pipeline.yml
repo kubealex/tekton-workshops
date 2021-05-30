@@ -1,0 +1,74 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-and-deploy
+spec:
+  resources:
+    - name: app-image
+      type: image
+  workspaces:
+    - name: shared-workspace
+    - name: maven-settings
+  tasks:
+    - name: fetch-source-repository
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      params:
+        - name: url
+          value: https://github.com/kubealex/hello-springboot.git
+    - name: maven-run
+      taskRef:
+        name: maven
+      runAfter:
+        - fetch-source-repository
+      params:
+        - name: GOALS
+          value:
+            - -DskipTests
+            - package
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: shared-workspace
+    - name: kaniko-build
+      taskRef:
+        name: build-kaniko-image
+      runAfter:
+        - maven-run
+      params:
+        - name: pathToDockerFile
+          value: Dockerfile
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      resources:
+        outputs:
+        - name: builtImage
+          resource: app-image
+    - name: fetch-manifests-repository
+      taskRef:
+        name: git-clone
+      runAfter:
+        - kaniko-build
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      params:
+        - name: url
+          value: https://github.com/kubealex/hello-manifests.git
+    - name: kustomize-manifests
+      runAfter:
+        - fetch-manifests-repository
+      taskRef:
+        name: kubernetes-deploy
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      resources:
+        inputs:
+          - name: app-image
+            resource: app-image

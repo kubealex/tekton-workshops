@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: kustomize-manifests
+  name: kubernetes-deploy
 spec:
   workspaces:
     - name: output
@@ -9,25 +9,11 @@ spec:
     inputs:
       - name: app-image
         type: image
-    # steps:
   steps:
-    # - name: echo
-    #   image: ubuntu
-    #   command:
-    #     - echo
-    #   args:
-    #     - "IMAGE:$(resources.inputs.app-image.url)"
-    # - name: ls
-    #   image: ubuntu
-    #   command:
-    #     - ls
-    #   args:
-    #     - "-latr"
-    #     - "/workspace/output/"
     - name: kustomize-phase
       image: quay.io/kubealex/kustokubectl:latest
       script: |
         #!/usr/bin/env bash
         cd $(workspaces.output.path)
         kustomize edit set image IMAGE=$(resources.inputs.app-image.url) 
-        kustomize build 
+        kustomize build | kubectl apply -f - -n tekton-workshop

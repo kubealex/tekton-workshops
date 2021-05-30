@@ -6,4 +6,4 @@ spec:
   type: image
   params:
     - name: url
-      value: quay.io/kubealex/hello-tekton:latest
+      value: <REGISTRY_HOST>/<USERNAME>/<IMAGE_NAME>:<TAG> # ie: quay.io/kubealex/hello-tekton:latest
