@@ -195,7 +195,7 @@ This will automatically trigger the pipeline and you can check the logs by typin
 
 Or you can also check a nice progress description with:
 
-    tkn describe pipeline build-and-deploy -n tekton-workshop
+    tkn pipeline describe build-and-deploy -n tekton-workshop
 
 If everything went good, you will find this situation:
 
