@@ -19,28 +19,42 @@ First of all, you need to clone this repository in your local folder!
 You will find a simple workshop to play with:  
 
 - [Build and deploy a SpringBoot application in your cluster](https://github.com/kubealex/tekton-ws/tree/main/workshops/springboot-build-deploy)
+- [Build your SpringBoot application and containerize it with Tekton and Kaniko](https://github.com/kubealex/tekton-workshops/tree/main/workshops/kaniko-image-build)
 
 
 As you can see in the content, each workshop contains its resources that are needed to run it.
 
     .
-    └── springboot-build-deploy
-        ├── README.md
-        ├── pipeline.yml
-        ├── resources
-        │   ├── git-repo.yml
-        │   ├── image-output.yml
-        │   ├── k8s
-        │   │   ├── pv.yml
-        │   │   ├── pvc.yml
-        │   │   ├── roleBinding.yml
-        │   │   └── serviceAccount.yml
-        │   └── maven-settings-cm.yml
-        └── tasks
-            ├── git-clone.yml
-            ├── k8s-deploy.yml
-            ├── kaniko-build.yml
-            └── maven.yml
+    ├── LICENSE
+    ├── README.md
+    └── workshops
+        ├── kaniko-image-build
+        │   ├── README.md
+        │   ├── registry-creds.yml
+        │   ├── resources
+        │   │   ├── git-repo.yml
+        │   │   ├── image-output.yml
+        │   │   └── k8s
+        │   │       └── serviceAccount.yml
+        │   ├── taskRun.yml
+        │   └── tasks
+        │       └── kaniko-build.yml
+        └── springboot-build-deploy
+            ├── README.md
+            ├── pipeline.yml
+            ├── pipelineRun.yml
+            ├── resources
+            │   ├── image-output.yml
+            │   ├── k8s
+            │   │   ├── pv.yml
+            │   │   ├── roleBinding.yml
+            │   │   └── serviceAccount.yml
+            │   └── maven-settings-cm.yml
+            └── tasks
+                ├── git-clone.yml
+                ├── k8s-deploy.yml
+                ├── kaniko-build.yml
+                └── maven.yml
 
 ### Setup Kubernetes
 
